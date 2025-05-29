@@ -1,1 +1,136 @@
-# POO
+import tkinter as tk
+from tkinter import simpledialog, messagebox
+productos = []
+
+def agregar_producto():
+   codigo = simpledialog.askstring("Agregar Producto", "Ingrese el código del producto:")
+   if not codigo:
+       messagebox.showwarning("Advertencia", "El código no puede estar vacío.")
+       return
+       
+   descripcion = simpledialog.askstring("Agregar Producto", "Ingrese la descripción del producto:")
+   if not descripcion:
+       messagebox.showwarning("Advertencia", "La descripción no puede estar vacía.")
+       return
+       
+   costo = simpledialog.askstring("Agregar Producto", "Ingrese el costo del producto:")
+   try:
+       costo = float(costo)
+   except (ValueError, TypeError):
+       messagebox.showerror("Error", "El costo debe ser un número válido.")
+       return
+   
+   stock = simpledialog.askstring("Agregar Producto", "Ingrese la cantidad en stock:")
+   try:
+       stock = int(stock)
+   except (ValueError, TypeError):
+       messagebox.showerror("Error", "El stock debe ser un número entero válido.")
+       return
+       
+   productos.append({"codigo": codigo, "descripcion": descripcion, "costo": costo, "stock": stock})
+   messagebox.showinfo("Éxito", "Producto agregado exitosamente.")
+
+def buscar_producto():
+    codigo = simpledialog.askstring("Buscar Producto", "Ingrese el código del producto a buscar:")
+    if not codigo:
+        messagebox.showwarning("Advertencia", "El código no puede estar vacío.")
+        return
+        
+    for i in productos:
+        if i["codigo"] == codigo:
+            messagebox.showinfo("Producto encontrado", f"Código: {i['codigo']}, Descripción: {i['descripcion']}, Costo: ${i['costo']}")
+            return
+    messagebox.showinfo("Resultado", "Producto no encontrado.")
+
+def eliminar_producto():
+    codigo = simpledialog.askstring("Eliminar Producto", "Ingrese el código del producto a eliminar:")
+    if not codigo:
+        messagebox.showwarning("Advertencia", "El código no puede estar vacío.")
+        return
+        
+    for i, p in enumerate(productos):
+        if p["codigo"] == codigo:
+            productos.pop(i)
+            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
+            return
+    messagebox.showinfo("Resultado", "Producto no encontrado para eliminar.")
+
+def imprimir_productos():
+    if not productos:
+        messagebox.showinfo("Productos", "No hay productos para mostrar.")
+        return
+        
+    productos_str = "\n".join([f"Código: {p['codigo']}, Descripción: {p['descripcion']}, Costo: ${p['costo']}" for p in productos])
+    messagebox.showinfo("Productos registrados", productos_str)
+
+def crear_menu():
+    ventana = tk.Tk()
+    ventana.title("Gestión de Productos")
+    ventana.geometry("300x400")
+    
+    btn_agregar = tk.Button(ventana, text="Agregar Producto", command=agregar_producto, width=20)
+    btn_agregar.pack(pady=10)
+    
+    btn_buscar = tk.Button(ventana, text="Buscar Producto", command=buscar_producto, width=20)
+    btn_buscar.pack(pady=10)
+    
+    btn_eliminar = tk.Button(ventana, text="Eliminar Producto", command=eliminar_producto, width=20)
+    btn_eliminar.pack(pady=10)
+    
+    btn_imprimir = tk.Button(ventana, text="Imprimir Productos", command=imprimir_productos, width=20)
+    btn_imprimir.pack(pady=10)
+    
+    btn_salir = tk.Button(ventana, text="Salir", command=ventana.quit, width=20)
+    btn_salir.pack(pady=10)
+    
+    ventana.mainloop()
+    messagebox.showinfo("Fin", "Salió del programa")
+
+def consultar_stock():
+    
+    
+   if not productos:
+       messagebox.showinfo("Stock", "No hay productos en el inventario.")
+       return
+     
+   conteo_productos = {}
+   for producto in productos:
+       descripcion = producto["descripcion"]
+       if descripcion in conteo_productos:
+           conteo_productos[descripcion] += 1
+       else:
+           conteo_productos[descripcion] = 1
+           
+   stock_info = "\n".join([f"{nombre}: {cantidad}" for nombre, cantidad in conteo_productos.items()])
+   messagebox.showinfo("Stock Total", stock_info)
+    
+def crear_menu():
+    ventana = tk.Tk()
+    ventana.title("Gestión de Productos")
+    ventana.geometry("300x400")
+    
+    # Botones para las opciones del menú
+    btn_agregar = tk.Button(ventana, text="Agregar Producto", command=agregar_producto, width=20)
+    btn_agregar.pack(pady=10)
+    
+    btn_buscar = tk.Button(ventana, text="Buscar Producto", command=buscar_producto, width=20)
+    btn_buscar.pack(pady=10)
+    
+    btn_eliminar = tk.Button(ventana, text="Eliminar Producto", command=eliminar_producto, width=20)
+    btn_eliminar.pack(pady=10)
+    
+    btn_imprimir = tk.Button(ventana, text="Imprimir Productos", command=imprimir_productos, width=20)
+    btn_imprimir.pack(pady=10)
+    
+    # AGREGAR ESTA LÍNEA:
+    btn_stock = tk.Button(ventana, text="Consultar Stock", command=consultar_stock, width=20)
+    btn_stock.pack(pady=10)
+    
+    btn_salir = tk.Button(ventana, text="Salir", command=ventana.quit, width=20)
+    btn_salir.pack(pady=10)
+    
+    ventana.mainloop()
+    messagebox.showinfo("Fin", "Salió del programa")
+    
+if __name__ == "__main__":
+    crear_menu()
