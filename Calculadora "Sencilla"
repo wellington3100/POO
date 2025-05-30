@@ -1,0 +1,111 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class CalculadoraSimple:
+    def __init__(self):
+        self.ventana = tk.Tk()
+        self.ventana.title("Calculadora Simple")
+        self.ventana.geometry("600x500")
+        self.ventana.resizable(False, False)
+        
+        
+        self.n1_var = tk.StringVar()
+        self.n2_var = tk.StringVar()
+        self.resultado_var = tk.StringVar()
+        self.resultado_var.set("0")
+        
+        self.crear_interfaz()
+    
+    def crear_interfaz(self):
+        
+        titulo = tk.Label(self.ventana, text="Calculadora", font=("Arial", 16, "bold"))
+        titulo.pack(pady=10)
+        
+        
+        frame_n1 = tk.Frame(self.ventana)
+        frame_n1.pack(pady=5)
+        tk.Label(frame_n1, text="N1:", font=("Arial", 12)).pack(side=tk.LEFT)
+        entry_n1 = tk.Entry(frame_n1, textvariable=self.n1_var, width=15, font=("Arial", 12))
+        entry_n1.pack(side=tk.LEFT, padx=10)
+        
+        
+        frame_n2 = tk.Frame(self.ventana)
+        frame_n2.pack(pady=5)
+        tk.Label(frame_n2, text="N2:", font=("Arial", 12)).pack(side=tk.LEFT)
+        entry_n2 = tk.Entry(frame_n2, textvariable=self.n2_var, width=15, font=("Arial", 12))
+        entry_n2.pack(side=tk.LEFT, padx=10)
+        
+        
+        frame_result = tk.Frame(self.ventana)
+        frame_result.pack(pady=10)
+        tk.Label(frame_result, text="Result:", font=("Arial", 12)).pack(side=tk.LEFT)
+        result_label = tk.Label(frame_result, textvariable=self.resultado_var, 
+                               width=15, font=("Arial", 12), 
+                                bg="white")
+        result_label.pack(side=tk.LEFT, padx=10)
+        
+        
+        frame_botones = tk.Frame(self.ventana)
+        frame_botones.pack(pady=15)
+        
+        
+        btn_suma = tk.Button(frame_botones, text="+", width=5, height=2, 
+                            font=("Arial", 14), 
+                            command=lambda: self.calcular('+'))
+        btn_suma.grid(row=0, column=0, padx=5, pady=5)
+        
+        btn_resta = tk.Button(frame_botones, text="-", width=5, height=2, 
+                             font=("Arial", 14), 
+                             command=lambda: self.calcular('-'))
+        btn_resta.grid(row=0, column=1, padx=5, pady=5)
+        
+        btn_multiplicacion = tk.Button(frame_botones, text="*", width=5, height=2, 
+                                      font=("Arial", 14), 
+                                      command=lambda: self.calcular('*'))
+        btn_multiplicacion.grid(row=0, column=2, padx=5, pady=5)
+        
+        btn_division = tk.Button(frame_botones, text="/", width=5, height=2, 
+                                font=("Arial", 14), 
+                                command=lambda: self.calcular('/'))
+        btn_division.grid(row=0, column=3, padx=5, pady=5)
+        
+        btn_limpiar = tk.Button(frame_botones, text="Limpiar", width=22, height=2,
+                               font=("Arial", 14),
+                               command=lambda: [self.n1_var.set(''), self.n2_var.set(''), self.resultado_var.set('')])
+        btn_limpiar.grid(row=1, column=0, columnspan=4, padx=5, pady=5)
+    
+    
+    def calcular(self, operacion):
+        try:
+            
+            n1 = float(self.n1_var.get())
+            n2 = float(self.n2_var.get())
+            
+            if operacion == '+':
+                resultado = n1 + n2
+            elif operacion == '-':
+                resultado = n1 - n2
+            elif operacion == '*':
+                resultado = n1 * n2
+            elif operacion == '/':
+                if n2 == 0:
+                    messagebox.showerror("Error", "No se puede dividir por cero")
+                    return
+                resultado = n1 / n2
+            
+            if resultado == int(resultado):
+                self.resultado_var.set(str(int(resultado)))
+            else:
+                self.resultado_var.set(f"{resultado:.2f}")
+                
+        except ValueError:
+            messagebox.showerror("Error", "Por favor ingresa números válidos")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error inesperado: {str(e)}")
+    
+    def ejecutar(self):
+        self.ventana.mainloop()
+
+if __name__ == "__main__":
+    calculadora = CalculadoraSimple()
+    calculadora.ejecutar()
