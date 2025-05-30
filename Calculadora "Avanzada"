@@ -1,0 +1,100 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class Calculadora:
+    def __init__(self):
+        self.ventana = tk.Tk()
+        self.ventana.title("Calculadora Simple")
+        self.ventana.geometry("300x400")
+        self.ventana.resizable(False, False)
+        
+        
+        self.operacion = ""
+        
+        
+        self.pantalla = tk.Entry(self.ventana, font=("Arial", 16), justify="right", state="readonly")
+        self.pantalla.grid(row=0, column=0, columnspan=4, padx=10, pady=10, sticky="ew")
+        
+        
+        self.crear_botones()
+        
+    def crear_botones(self):
+        
+        botones = [
+            ('C', 1, 0), ('±', 1, 1), ('%', 1, 2), ('/', 1, 3),
+            ('7', 2, 0), ('8', 2, 1), ('9', 2, 2), ('*', 2, 3),
+            ('4', 3, 0), ('5', 3, 1), ('6', 3, 2), ('-', 3, 3),
+            ('1', 4, 0), ('2', 4, 1), ('3', 4, 2), ('+', 4, 3),
+            ('0', 5, 0), ('.', 5, 2), ('=', 5, 3)
+        ]
+        
+        for (texto, fila, columna) in botones:
+            if texto == '0':
+                
+                boton = tk.Button(self.ventana, text=texto, font=("Arial", 14), 
+                                command=lambda t=texto: self.click_boton(t))
+                boton.grid(row=fila, column=columna, columnspan=2, padx=2, pady=2, sticky="ew")
+            else:
+                boton = tk.Button(self.ventana, text=texto, font=("Arial", 14), 
+                                command=lambda t=texto: self.click_boton(t))
+                boton.grid(row=fila, column=columna, padx=2, pady=2, sticky="ew")
+        
+        
+        for i in range(4):
+            self.ventana.grid_columnconfigure(i, weight=1)
+    
+    def click_boton(self, valor):
+        if valor == 'C':
+            self.operacion = ""
+            self.actualizar_pantalla()
+            
+        elif valor == '=':
+            try:
+                
+                resultado = eval(self.operacion)
+                self.operacion = str(resultado)
+                self.actualizar_pantalla()
+            except:
+                messagebox.showerror("error", "Operación invalida")
+                self.operacion = ""
+                self.actualizar_pantalla()
+                
+        elif valor == '±':
+            try:
+                if self.operacion:
+                    
+                    if self.operacion.startswith('-'):
+                        self.operacion = self.operacion[1:]
+                    else:
+                        self.operacion = '-' + self.operacion
+                    self.actualizar_pantalla()
+            except:
+                messagebox.showerror("error", "no se puede cambiar el signo")
+                
+        elif valor == '%':
+            try:
+                if self.operacion:
+                    resultado = eval(self.operacion) / 100
+                    self.operacion = str(resultado)
+                    self.actualizar_pantalla()
+            except:
+                messagebox.showerror("error", "operación invalida")
+                
+        else:
+            
+            self.operacion += valor
+            self.actualizar_pantalla()
+    
+    def actualizar_pantalla(self):
+        self.pantalla.config(state="normal")
+        self.pantalla.delete(0, tk.END)
+        self.pantalla.insert(0, self.operacion)
+        self.pantalla.config(state="readonly")
+    
+    def iniciar(self):
+        self.ventana.mainloop()
+
+
+if __name__ == "__main__":
+    calc = Calculadora()
+    calc.iniciar()
