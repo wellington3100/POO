@@ -1,0 +1,173 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+
+
+cursos = []
+
+def menu_principal():
+    
+    opciones = """GESTIÓN DE CURSOS
+    
+1. Añadir curso
+2. Buscar curso
+3. Eliminar curso
+4. Imprimir todos los cursos
+5. Imprimir cantidad y total
+6. Salir
+
+Seleccione una opción:"""
+    
+    opcion = simpledialog.askstring("Menú Principal", opciones)
+    return opcion
+
+def seleccionar_titulo():
+    
+    titulos = """Materias :
+    
+1. Python desde Cero
+2. Back-end
+3. IA
+
+Seleccione el número:"""
+    
+    opcion = simpledialog.askstring("Elija su materia", titulos)
+    
+    if opcion == "1":
+        return "Python desde Cero"
+    elif opcion == "2":
+        return "Back-end"
+    elif opcion == "3":
+        return "IA"
+    else:
+        return None
+
+def añadir_curso():
+    
+    id_curso = simpledialog.askstring("Nuevo Curso", "Ingrese el ID del curso:")
+    if not id_curso:
+        return
+    
+    
+    for curso in cursos:
+        if curso['id'] == id_curso:
+            messagebox.showerror("Error", "El ID ya existe")
+            return
+    
+   
+    titulo = seleccionar_titulo()
+    if not titulo:
+        messagebox.showerror("Error", "Debe seleccionar un título válido")
+        return
+    
+    
+    duracion = simpledialog.askstring("Duración", "Ingrese la duracion en horas:")
+    if not duracion:
+        return
+    
+    
+    costo = simpledialog.askstring("Costo", "Ingrese el costo del curso:")
+    if not costo:
+        return
+    
+    
+    curso = {
+        'id': id_curso,
+        'titulo': titulo,
+        'duracion': duracion,
+        'costo': costo
+    }
+    
+    cursos.append(curso)
+    messagebox.showinfo("Éxito", f"Curso '{titulo}' añadido correctamente")
+
+def buscar_curso():
+    
+    id_buscar = simpledialog.askstring("Buscar Curso", "Ingrese el ID del curso a buscar:")
+    if not id_buscar:
+        return
+    
+    for curso in cursos:
+        if curso['id'] == id_buscar:
+            info = f"""CURSO ENCONTRADO:
+            
+ID: {curso['id']}
+Título: {curso['titulo']}
+Duración: {curso['duracion']} horas
+Costo: ${curso['costo']}"""
+            messagebox.showinfo("Curso Encontrado", info)
+            return
+    
+    messagebox.showerror("No encontrado", "Curso no encontrado")
+
+def eliminar_curso():
+    
+    id_eliminar = simpledialog.askstring("Eliminar Curso", "Ingrese el ID del curso a eliminar:")
+    if not id_eliminar:
+        return
+    
+    for i, curso in enumerate(cursos):
+        if curso['id'] == id_eliminar:
+            cursos.pop(i)
+            messagebox.showinfo("Éxito", f"Curso eliminado correctamente")
+            return
+    
+    messagebox.showerror("Error", "Curso no encontrado")
+
+def imprimir_todos():
+    
+    if not cursos:
+        messagebox.showinfo("Lista de Cursos", "No hay cursos registrados")
+        return
+    
+    lista = "TODOS LOS CURSOS:\n\n"
+    for curso in cursos:
+        lista += f"ID: {curso['id']} | {curso['titulo']} | {curso['duracion']}h | ${curso['costo']}\n"
+    
+    messagebox.showinfo("Lista de Cursos", lista)
+
+def imprimir_resumen():
+    
+    if not cursos:
+        messagebox.showinfo("Resumen", "No hay cursos registrados")
+        return
+    
+    cantidad = len(cursos)
+    total = sum(float(curso['costo']) for curso in cursos)
+    
+    resumen = f"""RESUMEN:
+    
+Cantidad de cursos: {cantidad}
+Total en costos: ${total:.2f}"""
+    
+    messagebox.showinfo("Resumen", resumen)
+
+def main():
+    
+    root = tk.Tk()
+    root.withdraw()  
+    
+    messagebox.showinfo("Universidad Tecnologica de Coahuila", "Bienvenido al sistema")
+    
+    while True:
+        opcion = menu_principal()
+        
+        if opcion == "1":
+            añadir_curso()
+        elif opcion == "2":
+            buscar_curso()
+        elif opcion == "3":
+            eliminar_curso()
+        elif opcion == "4":
+            imprimir_todos()
+        elif opcion == "5":
+            imprimir_resumen()
+        elif opcion == "6":
+            messagebox.showinfo("Salir", "Cerrando Sesion")
+            break
+        else:
+            messagebox.showerror("Error", "Error opcion no valida")
+    
+    root.destroy()
+
+if __name__ == "__main__":
+    main()
