@@ -1,0 +1,45 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class VentanaFormulario():
+    def __init__(self): 
+        # Crear la ventana principal
+        self.ventana = tk.Tk()
+        self.ventana.title("Imprimir Edad")
+        self.ventana.geometry("400x150")
+        self.ventana.configure(bg="#a9cce3")
+        self.ventana.resizable(False, False)
+        
+        # Año de nacimiento
+        self.label = tk.Label(self.ventana, text="Año de Nacimiento", bg="#a9cce3", font=("Arial", 12))
+        self.label.grid(row=0, column=0, padx=20, pady=10, sticky="w")
+        self.anacimiento = tk.Entry(self.ventana, font=("Arial", 12))
+        self.anacimiento.grid(row=0, column=1, padx=10, pady=10)
+        
+        # Edad (se mostrará en este campo)
+        self.label = tk.Label(self.ventana, text="Tu Edad es", bg="#a9cce3", font=("Arial", 12))
+        self.label.grid(row=1, column=0, padx=20, pady=10, sticky="w")
+        
+        self.var_edad = tk.StringVar()
+        self.edad = tk.Entry(self.ventana, font=("Arial", 12), textvariable=self.var_edad, state="readonly")
+        self.edad.grid(row=1, column=1, padx=10, pady=10)
+        
+        # Botón
+        self.imprimir = tk.Button(self.ventana, text="Calcular Edad", command=self.calcularEdad, font=("Arial", 10))
+        self.imprimir.grid(row=3, column=0, columnspan=2, pady=10)
+
+    def calcularEdad(self):
+        try:
+            anac = int(self.anacimiento.get())
+            tuedad = 2025 - anac
+            self.var_edad.set(str(tuedad))
+        except ValueError:
+            messagebox.showerror("Error", "Por favor, ingresa un año válido.")
+            self.anacimiento.delete(0, tk.END)
+
+    def ejecutar(self):
+        self.ventana.mainloop()
+
+if __name__ == "__main__":
+    formulario = VentanaFormulario()
+    formulario.ejecutar()
