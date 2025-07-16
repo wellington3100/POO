@@ -1,0 +1,102 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import mariadb
+import subprocess #para ejecutar otro script
+import sys #para obtener argumentos de línea de comando
+from db_config import MiBaseDatos
+
+
+class AplicacionCrearCuenta:
+    def __init__(self):
+        self.ventana = tk.Tk()
+        self.ventana.title("Crear Cuenta")
+
+        ancho = 400
+        alto = 400
+
+        pantalla_ancho = self.ventana.winfo_screenwidth()
+        pantalla_alto = self.ventana.winfo_screenheight()
+        pos_x = (pantalla_ancho // 2) - (ancho // 2)
+        pos_y = (pantalla_alto // 2) - (alto // 2)
+        self.ventana.geometry(f"{ancho}x{alto}+{pos_x}+{pos_y}")
+
+        self.ventana.configure(bg="#e0e0e0")
+        self.ventana.resizable(False, False)
+        self.usuario_actual = None
+        self.db = MiBaseDatos()
+        self.db.conectar()
+
+        self.crear_ventana_registro()
+
+    def crear_ventana_registro(self):
+        ttk.Label(self.ventana, text="Nombre Completo:").pack(pady=(30, 5))
+        self.entrada_nombre_user = ttk.Entry(self.ventana)
+        self.entrada_nombre_user.pack()
+
+        ttk.Label(self.ventana, text="Nombre de Usuario:").pack(pady=(10, 5))
+        self.entrada_usuario = ttk.Entry(self.ventana)
+        self.entrada_usuario.pack()
+
+        ttk.Label(self.ventana, text="Contraseña:").pack(pady=(10, 5))
+        self.entrada_password = ttk.Entry(self.ventana)
+        #self.entrada_password = ttk.Entry(self.ventana, show="*") #en caso de que se quiera ocultar la contraseña
+        self.entrada_password.pack()
+
+        ttk.Label(self.ventana, text="Confirmar Contraseña:").pack(pady=(10, 5))
+        self.entrada_confirmar_password = ttk.Entry(self.ventana)
+        #self.entrada_confirmar_password = ttk.Entry(self.ventana, show="*") #en caso de que se quiera ocultar la contraseña
+        self.entrada_confirmar_password.pack()
+
+        ttk.Button(self.ventana, text="Crear Cuenta", command=self.crear_cuenta).pack(pady=20)
+
+    def crear_cuenta(self):
+        nombre_user = self.entrada_nombre_user.get()
+        usuario = self.entrada_usuario.get()
+        password = self.entrada_password.get()
+        confirmar_password = self.entrada_confirmar_password.get()
+
+        if not nombre_user or not usuario or not password or not confirmar_password:
+            messagebox.showerror("Error", "Todos los campos son obligatorios")
+            return
+
+        if password != confirmar_password:
+            messagebox.showerror("Error", "Las contraseñas no coinciden")
+            return
+
+        # Verificar si el usuario ya existe
+        cursor = self.db.conexion.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=?", (usuario,))
+        resultado = cursor.fetchone()
+        
+        if resultado:
+            messagebox.showerror("Error", "El usuario ya existe")
+            return
+
+        # Crear el nuevo usuario
+        try:
+            cursor.execute("INSERT INTO usuarios (nombre_user, usuario, password) VALUES (?, ?, ?)", (nombre_user, usuario, password))
+            self.db.conexion.commit()
+            self.usuario_actual = usuario
+            messagebox.showinfo("Éxito", f"Cuenta creada exitosamente para {self.usuario_actual}")
+            #subprocess.Popen(["python", "C:\\Users\\Crisa\\OneDrive\\Desktop\\programacion_orientado_a_objetos\\codigos\\usuario_login\\HolaMundo.py", self.usuario_actual])
+            subprocess.Popen(["python", "C:\\Users\\Crisa\\OneDrive\\Desktop\\programacion_orientado_a_objetos\\codigos\\usuario_login\\usuarios.py", self.usuario_actual])
+
+            self.ventana.destroy()
+        except mariadb.Error as e:
+            messagebox.showerror("Error", f"Error al crear la cuenta: {e}")
+            self.entrada_nombre_user.delete(0, tk.END)
+            self.entrada_usuario.delete(0, tk.END)
+            self.entrada_password.delete(0, tk.END)
+            self.entrada_confirmar_password.delete(0, tk.END)
+
+    def ejecutar(self):
+        self.ventana.mainloop()
+
+    def on_closing(self):
+        if self.db.conexion:
+            self.db.close()
+        self.ventana.destroy()
+
+if __name__ == "__main__":
+    app = AplicacionCrearCuenta()
+    app.ejecutar()
