@@ -1,0 +1,56 @@
+import mariadb
+import tkinter as tk
+from tkinter import ttk, messagebox
+from db_config import MiBaseDatos
+
+class AplicacionLogin:
+    def __init__(self):
+# ─── INICIALIZACIÓN DE LA VENTANA ───────────────────────────────
+        self.ventana = tk.Tk()
+        self.ventana.title("Iniciar Sesión")
+        ancho = 400
+        alto = 300
+        pantalla_ancho = self.ventana.winfo_screenwidth()
+        pantalla_alto = self.ventana.winfo_screenheight()
+        pos_x = (pantalla_ancho // 2) - (ancho // 2)
+        pos_y = (pantalla_alto // 2) - (alto // 2)
+        self.ventana.geometry(f"{ancho}x{alto}+{pos_x}+{pos_y}")
+        self.ventana.configure(bg="#e0e0e0")
+        self.ventana.resizable(False, False)
+        self.usuario_actual = None
+
+        self.crear_ventana_login()
+
+# ─── MÉTODO PARA CREAR LA VENTANA DE INICIO DE SESIÓN ──────────────
+    def crear_ventana_login(self):
+        ttk.Label(self.ventana, text="Usuario:").pack(pady=(30, 5))
+        self.entrada_usuario = ttk.Entry(self.ventana)
+        self.entrada_usuario.pack()
+
+        ttk.Label(self.ventana, text="Contraseña:").pack(pady=(10, 5))
+        self.entrada_contraseña = ttk.Entry(self.ventana)
+        self.entrada_contraseña.pack()
+
+        ttk.Button(self.ventana, text="Iniciar Sesión", command=self.iniciar_sesion).pack(pady=10)
+
+# ─── MÉTODO PARA INICIAR SESIÓN ────────────────────────────────────────
+    def iniciar_sesion(self):
+        usuario = self.entrada_usuario.get()
+        password = self.entrada_contraseña.get()
+
+        if not usuario or not password:
+            messagebox.showerror("Error", "Usuario y contraseña son obligatorios")
+            return
+        else:
+            pass
+
+    def ejecutar(self):
+        self.ventana.mainloop()
+
+    def on_closing(self):
+        self.ventana.destroy()
+    
+
+if __name__ == "__main__":
+    app = AplicacionLogin()
+    app.ejecutar()
