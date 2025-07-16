@@ -1,27 +1,33 @@
-import mariadb
 import tkinter as tk
 from tkinter import ttk, messagebox
+import mariadb
+import subprocess #para ejecutar otro script
+import sys #para obtener argumentos de línea de comando
 from db_config import MiBaseDatos
+
 
 class AplicacionLogin:
     def __init__(self):
-# ─── INICIALIZACIÓN DE LA VENTANA ───────────────────────────────
         self.ventana = tk.Tk()
         self.ventana.title("Iniciar Sesión")
+
         ancho = 400
         alto = 300
+
         pantalla_ancho = self.ventana.winfo_screenwidth()
         pantalla_alto = self.ventana.winfo_screenheight()
         pos_x = (pantalla_ancho // 2) - (ancho // 2)
         pos_y = (pantalla_alto // 2) - (alto // 2)
         self.ventana.geometry(f"{ancho}x{alto}+{pos_x}+{pos_y}")
+
         self.ventana.configure(bg="#e0e0e0")
         self.ventana.resizable(False, False)
         self.usuario_actual = None
+        self.db = MiBaseDatos()
+        self.db.conectar()
 
         self.crear_ventana_login()
 
-# ─── MÉTODO PARA CREAR LA VENTANA DE INICIO DE SESIÓN ──────────────
     def crear_ventana_login(self):
         ttk.Label(self.ventana, text="Usuario:").pack(pady=(30, 5))
         self.entrada_usuario = ttk.Entry(self.ventana)
@@ -29,11 +35,11 @@ class AplicacionLogin:
 
         ttk.Label(self.ventana, text="Contraseña:").pack(pady=(10, 5))
         self.entrada_contraseña = ttk.Entry(self.ventana)
+        #self.entrada_contraseña = ttk.Entry(self.ventana, show="*") #en caso de que se quiera ocultar la contraseña
         self.entrada_contraseña.pack()
 
         ttk.Button(self.ventana, text="Iniciar Sesión", command=self.iniciar_sesion).pack(pady=10)
 
-# ─── MÉTODO PARA INICIAR SESIÓN ────────────────────────────────────────
     def iniciar_sesion(self):
         usuario = self.entrada_usuario.get()
         password = self.entrada_contraseña.get()
@@ -41,15 +47,30 @@ class AplicacionLogin:
         if not usuario or not password:
             messagebox.showerror("Error", "Usuario y contraseña son obligatorios")
             return
+
+        cursor = self.db.conexion.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=? AND password=?", (usuario, password))
+        resultado = cursor.fetchone()
+        if resultado:
+            self.usuario_actual = resultado[1]
+            messagebox.showinfo("Bienvenido", f"Hola {self.usuario_actual}, ya puedes acceder a los cursos.")
+            #subprocess.Popen(["python", "C:\\Users\\Crisa\\OneDrive\\Desktop\\programacion_orientado_a_objetos\\codigos\\usuario_login\\HolaMundo.py", self.usuario_actual])
+            subprocess.Popen(["python", "C:\\Users\\Crisa\\OneDrive\\Desktop\\programacion_orientado_a_objetos\\codigos\\usuario_login\\usuarios.py", self.usuario_actual])
+
+            self.ventana.destroy()
         else:
-            pass
+            messagebox.showerror("Error", "Usuario o contraseña incorrectos")
+            self.entrada_usuario.delete(0, tk.END)
+            self.entrada_contraseña.delete(0, tk.END)
+
 
     def ejecutar(self):
         self.ventana.mainloop()
 
     def on_closing(self):
+        if self.db.conexion:
+            self.db.close()
         self.ventana.destroy()
-    
 
 if __name__ == "__main__":
     app = AplicacionLogin()
